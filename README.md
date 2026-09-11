@@ -14,7 +14,7 @@ Comprehensive collection of Cisco Packet Tracer simulation files (`.pkt`) and de
   - [Practical 2: Inter-Subnet Communication using Switches & Routers (Static Routing & DHCP)](#practical-2-inter-subnet-communication-using-switches--routers-static-routing--dhcp)
   - [Practical 3: Multi-Router Dynamic Routing (OSPF) & Hardware Modularity (WIC-2T)](#practical-3-multi-router-dynamic-routing-ospf--hardware-modularity-wic-2t)
   - [Practical 4: Advanced Subnetting (VLSM /27) & Multi-Router Static Routing Tables](#practical-4-advanced-subnetting-vlsm-27--multi-router-static-routing-tables)
-  - [Practical 5: Integrated Multi-Network Topology Simulation](#practical-5-integrated-multi-network-topology-simulation)
+  - [Practical 5: Dynamic Routing Implementation using RIP Protocol (4-Router Mesh Topology)](#practical-5-dynamic-routing-implementation-using-rip-protocol-4-router-mesh-topology)
 - [How to Run Simulations](#-how-to-run-simulations)
 
 ---
@@ -24,7 +24,7 @@ Comprehensive collection of Cisco Packet Tracer simulation files (`.pkt`) and de
 * **Author:** Shaikh Mohammed Khizer  
 * **Enrollment:** `25CS501D053`  
 * **Simulator:** Cisco Packet Tracer (v5.1 / v8.0+)  
-* **Topics Covered:** LAN Topologies, Switch & Router Configuration, Static & Dynamic (OSPF) Routing, DHCP Pools, Subnetting (VLSM /27), WIC-2T Hardware Modules, ICMP Packet Verification.
+* **Topics Covered:** LAN Topologies, Switch & Router Configuration, Static & Dynamic (OSPF & RIP) Routing, DHCP Pools, Subnetting (VLSM /27), WIC-2T Hardware Modules, ICMP Packet Verification.
 
 ---
 
@@ -44,7 +44,8 @@ CN-practicals/
 │   ├── CN-PRACTICAL-1 .pdf    # Detailed lab guide for Practical 1
 │   ├── CN-PRACTICAL-2.pdf     # Detailed lab guide for Practical 2
 │   ├── CN-PRACTICAL-3.pdf     # Detailed lab guide for Practical 3
-│   └── CN-PRACTICAL-4.pdf     # Detailed lab guide for Practical 4
+│   ├── CN-PRACTICAL-4.pdf     # Detailed lab guide for Practical 4
+│   └── CN-PRACTICAL-5.pdf     # Detailed lab guide for Practical 5
 ├── prac-1.pkt                 # Packet Tracer simulation for Practical 1
 ├── prac-2.pkt                 # Packet Tracer simulation for Practical 2
 ├── prac-3.pkt                 # Packet Tracer simulation for Practical 3
@@ -199,9 +200,79 @@ Each router maintains static route entries mapping distant subnet destinations t
 
 ---
 
-### Practical 5: Integrated Multi-Network Topology Simulation
-* **File:** [`prac-5.pkt`](file:///d:/GIT/CN-practicals/prac-5.pkt)
-* **Aim:** Comprehensive practical lab combining multi-router topologies, custom IP subnets, LAN switching, and dynamic routing verification.
+### Practical 5: Dynamic Routing Implementation using RIP Protocol (4-Router Mesh Topology)
+* **File:** [`prac-5.pkt`](file:///d:/GIT/CN-practicals/prac-5.pkt) | **Lab Manual:** [`CN-PRACTICAL-5.pdf`](file:///d:/GIT/CN-practicals/PDF/CN-PRACTICAL-5.pdf)
+* **Aim:** To implement and configure the Routing Information Protocol (RIP) dynamic routing protocol across a 4-router interconnected network topology.
+
+#### 📐 Topology & Device Layout
+* **End Devices:** 8 PCs (2 PCs per LAN segment)
+* **Intermediate Devices:** 4 Network Switches (Cisco 2950-24), 4 Routers (Cisco 1841 with Serial WIC interfaces)
+* **4 Distinct LAN Subnets:**
+  - **LAN 0 (Router0):** `192.168.40.0/24` (`PC0`, `PC1` connected via `Switch0`)
+  - **LAN 1 (Router1):** `192.168.10.0/24` (`PC2`, `PC3` connected via `Switch1`)
+  - **LAN 2 (Router2):** `192.168.20.0/24` (`PC4`, `PC5` connected via `Switch2`)
+  - **LAN 3 (Router3):** `192.168.30.0/24` (`PC6`, `PC7` connected via `Switch3`)
+* **Serial Point-to-Point WAN Subnets:**
+  - `Router0` ↔ `Router1`: `192.168.50.0/24`
+  - `Router0` ↔ `Router3`: `192.168.60.0/24`
+  - `Router2` ↔ `Router3`: `192.168.70.0/24`
+  - `Router1` ↔ `Router2`: `192.168.80.0/24`
+
+#### 📊 Router Interface Addressing Scheme
+
+| Router | Interface | IP Address | Subnet Mask | Connected Network / Role |
+| :--- | :--- | :--- | :--- | :--- |
+| **Router0** | `FastEthernet0/0` | `192.168.40.1` | `255.255.255.0` | LAN 0 Gateway |
+| | `Serial0/0/0` | `192.168.50.3` | `255.255.255.0` | Link to Router1 (`192.168.50.0/24`) |
+| | `Serial0/0/1` | `192.168.60.2` | `255.255.255.0` | Link to Router3 (`192.168.60.0/24`) |
+| **Router1** | `FastEthernet0/0` | `192.168.10.1` | `255.255.255.0` | LAN 1 Gateway |
+| | `Serial0/0/0` | `192.168.50.2` | `255.255.255.0` | Link to Router0 (`192.168.50.0/24`) |
+| | `Serial0/0/1` | `192.168.80.2` | `255.255.255.0` | Link to Router2 (`192.168.80.0/24`) |
+| **Router2** | `FastEthernet0/0` | `192.168.20.1` | `255.255.255.0` | LAN 2 Gateway |
+| | `Serial0/0/0` | `192.168.70.3` | `255.255.255.0` | Link to Router3 (`192.168.70.0/24`) |
+| | `Serial0/0/1` | `192.168.80.3` | `255.255.255.0` | Link to Router1 (`192.168.80.0/24`) |
+| **Router3** | `FastEthernet0/0` | `192.168.30.1` | `255.255.255.0` | LAN 3 Gateway |
+| | `Serial0/0/0` | `192.168.70.2` | `255.255.255.0` | Link to Router2 (`192.168.70.0/24`) |
+| | `Serial0/0/1` | `192.168.60.3` | `255.255.255.0` | Link to Router0 (`192.168.60.0/24`) |
+
+#### ⚙️ RIP Protocol Configuration Highlights
+
+Each router is configured with RIP routing protocol to dynamically advertise directly connected LAN and WAN subnets:
+
+```cisco
+! Router 0 RIP Configuration
+router rip
+ network 192.168.40.0
+ network 192.168.50.0
+ network 192.168.60.0
+exit
+
+! Router 1 RIP Configuration
+router rip
+ network 192.168.10.0
+ network 192.168.50.0
+ network 192.168.80.0
+exit
+
+! Router 2 RIP Configuration
+router rip
+ network 192.168.20.0
+ network 192.168.70.0
+ network 192.168.80.0
+exit
+
+! Router 3 RIP Configuration
+router rip
+ network 192.168.30.0
+ network 192.168.60.0
+ network 192.168.70.0
+exit
+```
+
+#### 🧪 Testing & Verification
+* Configure static IP addresses and default gateways on all PCs (`PC0`/`PC1`: `192.168.40.2`-`3`, `PC2`/`PC3`: `192.168.10.2`-`3`, `PC4`/`PC5`: `192.168.20.2`-`3`, `PC6`/`PC7`: `192.168.30.2`-`3`).
+* Transmit ICMP Packets (PDUs) across different LAN subnets (e.g. from `PC0` to `PC3`).
+* *Note:* Initial PDU transmission may show **Failed** while RIP routing updates populate the routing tables and ARP resolves MAC addresses; subsequent packet transmissions achieve **Successful** delivery across the mesh topology.
 
 ---
 
