@@ -2,6 +2,12 @@
 /screenshots
 /screen-shots
 
+# Update folders
+/Update/
+/update/
+Update/
+update/
+
 # OS generated files
 Thumbs.db
 desktop.ini
@@ -10,3 +16,4 @@ desktop.ini
 # Temporary files
 *.tmp
 *.bak
+
